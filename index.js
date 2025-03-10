@@ -37,6 +37,13 @@ async function run() {
       res.send(result);
     })
 
+    app.get('/students/:id', async(req,res)=>{
+      const id = req.params.id;
+      const query = {_id:new ObjectId(id)};
+      const result = await StudentsCollection.findOne(query);
+      res.send( result);
+    })
+
     app.post('/students', async(req, res)=>{
       const student = req.body;
       console.log('new students', student);
@@ -44,6 +51,27 @@ async function run() {
       const result = await StudentsCollection.insertOne(student);
       res.send(result)
 
+    })
+
+    app.put('/students/:id', async(req, res)=>{
+      const id = req.params.id;
+      const student = req.body;
+      console.log(student,id)
+
+      const filter = {_id: new ObjectId(id)}
+      const options = {upsert:true};
+      const updatedStudent ={
+        $set:{
+         name: student.name,
+         className:student.className,
+         roll:student.roll,
+         father:student.father,
+         mother:student.mother,
+        }
+      }
+
+      const result = await StudentsCollection.updateOne(filter, updatedStudent, options);
+      res.send(result)
     })
 
     app.delete('/students/:id', async(req, res)=>{
